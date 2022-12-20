@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:notes/main.dart';
 
@@ -81,10 +82,26 @@ class _LoginView extends State<LoginView>{
 
                 ),
                 ElevatedButton(
-                  onPressed: (){
-                    // print the login details
-                    print(_email.text);
-                    print(_password.text);
+                  onPressed: ()async {
+                    try{
+                      String email = _email.text;
+                      String password = _password.text;
+                      await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+                      // do something on successfull login
+                      Navigator.of(context).pushNamedAndRemoveUntil("/notes/", (route) => false);
+                    }on FirebaseAuthException catch(e){
+                      if(e.code == "wrong-password"){
+                        print ("wrong password");
+                      }else if(e.code=="user-not-found"){
+                        print("User does not exist");
+                      }else{
+                        // show other errors
+                        print(e.code);
+                      }
+                    }catch(e){
+                      // show generic error code
+                      print(e);
+                    }
                   }, child: const Text("Login"),
                 ),
                 TextButton(onPressed: (){
@@ -98,5 +115,4 @@ class _LoginView extends State<LoginView>{
       ),
     );
   }
-
 }

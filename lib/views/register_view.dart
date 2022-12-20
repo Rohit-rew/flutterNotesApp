@@ -1,5 +1,6 @@
 
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Register_View extends StatefulWidget {
@@ -90,18 +91,38 @@ class _Register_View extends State<Register_View>{
                   ),
 
                 ),
-                ElevatedButton(onPressed: (){
+                ElevatedButton(onPressed: () async {
                   if(_password.text == _confirmPassword.text){
-                    print(_email.text);
-                    print(_confirmPassword.text);
+                    String email = _email.text;
+                    String password = _confirmPassword.text;
                     print("passwords match");
+                    try{
+                      String email = _email.text;
+                      String password = _password.text;
+                      UserCredential user = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+                      print(user);
+                      // send user to another route if logged in
+                    } on FirebaseAuthException catch(e) {
+                      if(e.code=="email-already-in-use"){
+                        // Show below error
+                        print("email already in use");
+                      }else if(e.code == "invalid-email"){
+                        // show below error
+                        print("Invalid Email");
+                      }else{
+                        // show generic error;
+                        print(e.code);
+                      }
+                    } catch (e){
+                      // show generic error
+                      print(e.toString());
+                    }
                   }else{
                     print("passwords do not match");
                   }
 
                 }, child: const Text("Register"),),
                 TextButton(onPressed: (){
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginView() ),);
                   Navigator.of(context).pushNamedAndRemoveUntil("/login/", (route) => false);
                 }, child: const Text("Login"),)
               ],

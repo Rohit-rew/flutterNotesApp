@@ -1,5 +1,8 @@
 
 
+import 'dart:math';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Notes_View extends StatefulWidget{
@@ -31,9 +34,25 @@ class _Notes_View extends State<Notes_View>{
     print(arrNotes.length);
     return Scaffold(
       appBar: AppBar(title: Text("Notes"), actions: [
-        PopupMenuButton(itemBuilder: (context){
-          return const  [PopupMenuItem(value: "Logout", child: Text("Logout"),)];
-        })
+        PopupMenuButton(
+            itemBuilder: (context){
+          return const [PopupMenuItem(value: "Logout", child: const Text("Logout"),)];
+        },
+        onSelected: (value) async {
+              switch(value){
+                case "Logout" :
+                  bool logout = await showLogoutConfirmation(context);
+                  if(logout){
+                    await FirebaseAuth.instance.signOut();
+                    Navigator.of(context).pushNamedAndRemoveUntil("/login/", (route) => false);
+                  }
+                  break;
+                default :
+                  print("no default");
+                  break;
+              }
+        },
+        )
       ]),
       body: ListView.builder(itemBuilder: (context , index){
         return Card(
@@ -46,10 +65,29 @@ class _Notes_View extends State<Notes_View>{
         );
       }, itemCount: arrNotes.length,),
       floatingActionButton: ElevatedButton(onPressed: (){
-
       } , child: Icon(Icons.add),),
 
     );
   }
+
+}
+
+Future<bool> showLogoutConfirmation(BuildContext context){
+
+    return showDialog<bool>(context: context ,
+        builder: (context){
+      return AlertDialog(
+        title: const Text("Logout ?"),
+        content: const Text("Are you sure you want to Logout ?"),
+        actions:  [
+          TextButton(onPressed: (){
+            Navigator.of(context).pop(false);
+          }, child:const Text("Cancel")),
+          TextButton(onPressed: (){
+            Navigator.of(context).pop(true);
+          }, child:const Text("Logout")),
+        ],
+      );
+    }).then((value) => value ?? false);
 
 }
