@@ -1,7 +1,10 @@
-
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:notes/services/Auth.dart';
+import 'package:notes/services/auth_exceptions.dart';
+import 'package:notes/utils/error_dialog.dart';
+
+import '../utils/success_dialog.dart';
 
 class Register_View extends StatefulWidget {
   Register_View({super.key});
@@ -9,8 +12,7 @@ class Register_View extends StatefulWidget {
   State<Register_View> createState() => _Register_View();
 }
 
-class _Register_View extends State<Register_View>{
-
+class _Register_View extends State<Register_View> {
   late final TextEditingController _email;
   late final TextEditingController _password;
   late final TextEditingController _confirmPassword;
@@ -30,33 +32,35 @@ class _Register_View extends State<Register_View>{
     _confirmPassword.dispose();
     super.dispose();
   }
+
   @override
-  Widget build(BuildContext context){
-    print("Register mounts");
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Register"),),
+      appBar: AppBar(
+        title: const Text("Register"),
+      ),
       body: Center(
-        child: Container(
+        child: SizedBox(
           width: double.infinity,
           height: 350,
           child: Padding(
             padding: const EdgeInsets.all(10),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children:  [
+              children: [
                 TextField(
                   controller: _email,
-                  decoration: const  InputDecoration(
+                  decoration: const InputDecoration(
                       hintText: "Email",
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10),),
-                          borderSide: BorderSide(color: Colors.black , width: 1)
-                      ),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10),
+                          ),
+                          borderSide:
+                              BorderSide(color: Colors.black, width: 1)),
                       enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black , width: 1),
-                          borderRadius: BorderRadius.all(Radius.circular(10))
-                      )
-                  ),
+                          borderSide: BorderSide(color: Colors.black, width: 1),
+                          borderRadius: BorderRadius.all(Radius.circular(10)))),
                 ),
                 TextField(
                   controller: _password,
@@ -64,15 +68,17 @@ class _Register_View extends State<Register_View>{
                   decoration: InputDecoration(
                       hintText: "Password",
                       border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10),),
-                          borderSide: BorderSide(color: Colors.black , width: 1)
-                      ),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(10),
+                          ),
+                          borderSide:
+                              BorderSide(color: Colors.black, width: 1)),
                       enabledBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black , width: 1),
-                          borderRadius: BorderRadius.all(Radius.circular(10))
-                      ),
-                      suffixIcon: IconButton(onPressed: (){}, icon: const Icon(Icons.remove_red_eye))
-                  ),
+                          borderSide: BorderSide(color: Colors.black, width: 1),
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      suffixIcon: IconButton(
+                          onPressed: () {},
+                          icon: const Icon(Icons.remove_red_eye))),
                 ),
                 TextField(
                   obscureText: true,
@@ -80,51 +86,53 @@ class _Register_View extends State<Register_View>{
                   decoration: InputDecoration(
                     hintText: "Confirm Password",
                     border: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10),),
-                        borderSide: BorderSide(color: Colors.black , width: 1)
-                    ),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                        borderSide: BorderSide(color: Colors.black, width: 1)),
                     enabledBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black , width: 1),
-                        borderRadius: BorderRadius.all(Radius.circular(10))
+                        borderSide: BorderSide(color: Colors.black, width: 1),
+                        borderRadius: BorderRadius.all(Radius.circular(10))),
+                    suffixIcon: IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.remove_red_eye),
                     ),
-                    suffixIcon: IconButton(onPressed: (){}, icon: const Icon(Icons.remove_red_eye),),
                   ),
-
                 ),
-                ElevatedButton(onPressed: () async {
-                  if(_password.text == _confirmPassword.text){
-                    String email = _email.text;
-                    String password = _confirmPassword.text;
-                    print("passwords match");
-                    try{
-                      String email = _email.text;
-                      String password = _password.text;
-                      UserCredential user = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
-                      print(user);
-                      // send user to another route if logged in
-                    } on FirebaseAuthException catch(e) {
-                      if(e.code=="email-already-in-use"){
-                        // Show below error
-                        print("email already in use");
-                      }else if(e.code == "invalid-email"){
-                        // show below error
-                        print("Invalid Email");
-                      }else{
-                        // show generic error;
-                        print(e.code);
+                ElevatedButton(
+                  onPressed: () async {
+                    if (_password.text == _confirmPassword.text) {
+                      try {
+                        String email = _email.text;
+                        String password = _password.text;
+                        await FirebaseAuthService.registerNewUser(
+                            email: email, password: password);
+                        showSuccessDialog(context);
+                        // send user to another route if registered in
+                      } on EmailAlreadyInUseAuthException {
+                        showErrorDialog(context, "Email already in use");
+                      } on InvalidEmailAuthException {
+                        showErrorDialog(context, "Invalid Email");
+                      } on WeekpasswordAuthException {
+                        showErrorDialog(context, "Weak password");
+                      } on GenericAuthException {
+                        showErrorDialog(context, "Something Went Wrong");
+                      } catch (e) {
+                        showErrorDialog(context, e.toString());
                       }
-                    } catch (e){
-                      // show generic error
-                      print(e.toString());
+                    } else {
+                      showErrorDialog(context, "Passwords do not match");
                     }
-                  }else{
-                    print("passwords do not match");
-                  }
-
-                }, child: const Text("Register"),),
-                TextButton(onPressed: (){
-                  Navigator.of(context).pushNamedAndRemoveUntil("/login/", (route) => false);
-                }, child: const Text("Login"),)
+                  },
+                  child: const Text("Register"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pushNamedAndRemoveUntil("/login/", (route) => false);
+                  },
+                  child: const Text("Login"),
+                )
               ],
             ),
           ),

@@ -1,6 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:notes/services/Auth.dart';
 import 'package:notes/views/addNote_view.dart';
 import 'package:notes/views/login_view.dart';
 import 'package:notes/views/notes_view.dart';
@@ -29,11 +28,12 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Firebase.initializeApp(),
+      // future: Firebase.initializeApp(),
+      future: FirebaseAuthService.initialize(),
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.done:
-            User? user = FirebaseAuth.instance.currentUser;
+            var user = FirebaseAuthService.currentUser();
             if (user != null) {
               return Notes_View();
             } else {

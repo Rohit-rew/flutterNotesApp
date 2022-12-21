@@ -1,6 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:notes/main.dart';
+import 'package:notes/services/Auth.dart';
+import 'package:notes/services/auth_exceptions.dart';
+
+import '../utils/error_dialog.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -98,23 +100,19 @@ class _LoginView extends State<LoginView> {
                     try {
                       String email = _email.text;
                       String password = _password.text;
-                      await FirebaseAuth.instance.signInWithEmailAndPassword(
+                      await FirebaseAuthService.signIn(
                           email: email, password: password);
-                      // do something on successfull login
                       Navigator.of(context)
                           .pushNamedAndRemoveUntil("/notes/", (route) => false);
-                    } on FirebaseAuthException catch (e) {
-                      if (e.code == "wrong-password") {
-                        showErrorDialog(context, "Wrong Password");
-                      } else if (e.code == "user-not-found") {
-                        showErrorDialog(context, "User does not exist");
-                      } else if (e.code == "invalid-email") {
-                        showErrorDialog(context, "Invalid Email");
-                      } else {
-                        showErrorDialog(context, e.code.toString());
-                      }
+                    } on WrongPassAuthException {
+                      showErrorDialog(context, "Wrong Password");
+                    } on UserNotFoundAuthException {
+                      showErrorDialog(context, "User does not exist");
+                    } on InvalidEmailAuthException {
+                      showErrorDialog(context, "Invalid Email");
+                    } on GenericAuthException {
+                      showErrorDialog(context, "Something Went Wrong");
                     } catch (e) {
-                      // show generic error code
                       showErrorDialog(context, e.toString());
                     }
                   },
@@ -135,24 +133,4 @@ class _LoginView extends State<LoginView> {
       ),
     );
   }
-}
-
-Future showErrorDialog(BuildContext context, String errMsg) {
-  return showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text("Error"),
-        content: Text(errMsg),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text("ok"),
-          )
-        ],
-      );
-    },
-  );
 }
