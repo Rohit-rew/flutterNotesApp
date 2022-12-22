@@ -1,7 +1,6 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:notes/firebase_options.dart';
-import 'package:notes/services/Auth.dart';
+import 'package:notes/services/auth/Auth.dart';
+import 'package:notes/services/storage/sqlite_storage_service.dart';
 import 'package:notes/views/login_view.dart';
 import 'package:notes/views/notes_view.dart';
 import 'package:notes/views/register_view.dart';
@@ -25,8 +24,14 @@ void main() async {
   );
 }
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
