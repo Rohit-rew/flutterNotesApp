@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notes/main.dart';
 import 'package:notes/services/auth/Auth.dart';
 import 'package:notes/services/auth/auth_exceptions.dart';
 import 'package:notes/services/storage/sqlite_storage_service.dart';
@@ -85,7 +86,14 @@ class _Notes_View extends State<Notes_View> {
                 ),
                 floatingActionButton: ElevatedButton(
                   onPressed: () {
-                    // Navigator.push(context, )
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return AddNoteView();
+                        },
+                      ),
+                    );
                   },
                   child: const Icon(Icons.add),
                 ),

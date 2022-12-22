@@ -14,7 +14,7 @@ void main() async {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: const AddNoteView(),
+      home: const HomeView(),
       routes: {
         "/login/": (context) => const LoginView(),
         "/register/": (context) => Register_View(),
@@ -101,8 +101,12 @@ class _AddNoteView extends State<AddNoteView> {
                       )),
                 ),
                 ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       print(noteText.text);
+
+                      // await NoteService().openDb();
+                      // await NoteService().createNote(note: noteText.text);
+                      // Navigator.pop(context);
                     },
                     child: const Text("Add"))
               ],
