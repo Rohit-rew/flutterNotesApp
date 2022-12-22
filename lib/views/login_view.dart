@@ -48,6 +48,7 @@ class _LoginView extends State<LoginView> {
                 TextField(
                   controller: _email,
                   keyboardType: TextInputType.emailAddress,
+                  autocorrect: false,
                   decoration: const InputDecoration(
                     hintText: "Email",
                     border: OutlineInputBorder(
@@ -120,7 +121,6 @@ class _LoginView extends State<LoginView> {
                 ),
                 TextButton(
                   onPressed: () {
-                    // Navigator.push(context, MaterialPageRoute(builder: (context)=> Register_View(),),);
                     Navigator.of(context).pushNamedAndRemoveUntil(
                         "/register/", (route) => false);
                   },

@@ -1,12 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:notes/services/auth_exceptions.dart';
+import '../firebase_options.dart';
 
 class FirebaseAuthService {
   FirebaseAuthService();
 
   static initialize() async {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
   }
 
   static User? currentUser() {
