@@ -14,7 +14,7 @@ void main() async {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: const HomeView(),
+      home: const AddNoteView(),
       routes: {
         "/login/": (context) => const LoginView(),
         "/register/": (context) => Register_View(),
@@ -49,6 +49,67 @@ class _HomeViewState extends State<HomeView> {
             return CircularProgressIndicator();
         }
       },
+    );
+  }
+}
+
+class AddNoteView extends StatefulWidget {
+  const AddNoteView({super.key});
+
+  @override
+  State<AddNoteView> createState() => _AddNoteView();
+}
+
+class _AddNoteView extends State<AddNoteView> {
+  late TextEditingController noteText;
+
+  @override
+  void initState() {
+    noteText = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    noteText.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("New Note"),
+      ),
+      body: Center(
+        child: Container(
+          height: 150,
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextField(
+                  controller: noteText,
+                  decoration: const InputDecoration(
+                      hintText: "Enter your note here",
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(width: 2, color: Colors.black),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20),
+                        ),
+                      )),
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      print(noteText.text);
+                    },
+                    child: const Text("Add"))
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

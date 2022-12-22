@@ -17,14 +17,17 @@ class _Notes_View extends State<Notes_View> {
   Future<void> getAllNotes() async {
     List<Note> allnotes = await _noteService.getNotes();
     arrNotes = allnotes;
-    print(arrNotes);
   }
 
   Future<void> startService() async {
+    await _noteService.openDb();
+    await getAllNotes();
+  }
+
+  @override
+  void initState() {
     _noteService = NoteService();
-    _noteService.openDb().whenComplete(() async {
-      return await getAllNotes();
-    });
+    super.initState();
   }
 
   @override
@@ -81,7 +84,9 @@ class _Notes_View extends State<Notes_View> {
                   itemCount: arrNotes.length,
                 ),
                 floatingActionButton: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    // Navigator.push(context, )
+                  },
                   child: const Icon(Icons.add),
                 ),
               );
